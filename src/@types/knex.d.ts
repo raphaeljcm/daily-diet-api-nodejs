@@ -9,8 +9,7 @@ declare module 'knex/types/tables' {
       name: string;
       description?: string;
       followed_diet: boolean;
-      created_at: string;
-      updated_at?: string;
+      meal_time: string;
     };
   }
 }
