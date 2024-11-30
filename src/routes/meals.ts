@@ -40,6 +40,40 @@ export async function mealsRoutes(app: FastifyInstance) {
     },
   );
 
+  app.put(
+    '/:mealId',
+    { preHandler: [checkUserIdIdentity] },
+    async (req, reply) => {
+      const updateMealParams = z.object({
+        mealId: z.string(),
+      });
+      const updateMealBodySchema = z.object({
+        name: z.string(),
+        description: z.string().optional(),
+        mealTime: z.string(),
+        followedDiet: z.boolean(),
+      });
+      const { userId } = req.cookies;
+      const { mealId } = updateMealParams.parse(req.params);
+      const { name, description, mealTime, followedDiet } =
+        updateMealBodySchema.parse(req.body);
+
+      await knex('meals')
+        .update({
+          name,
+          description,
+          meal_time: mealTime,
+          followed_diet: followedDiet,
+        })
+        .where({
+          id: mealId,
+          user_id: userId,
+        });
+
+      return reply.status(204).send();
+    },
+  );
+
   app.post('/', async (req, reply) => {
     const createMealSchema = z.object({
       name: z.string(),
