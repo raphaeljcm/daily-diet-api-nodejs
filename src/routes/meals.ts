@@ -74,6 +74,25 @@ export async function mealsRoutes(app: FastifyInstance) {
     },
   );
 
+  app.delete(
+    '/:mealId',
+    { preHandler: [checkUserIdIdentity] },
+    async (req, reply) => {
+      const deleteMealParams = z.object({
+        mealId: z.string(),
+      });
+      const { mealId } = deleteMealParams.parse(req.params);
+      const { userId } = req.cookies;
+
+      await knex('meals').delete().where({
+        id: mealId,
+        user_id: userId,
+      });
+
+      return reply.status(204).send();
+    },
+  );
+
   app.post('/', async (req, reply) => {
     const createMealSchema = z.object({
       name: z.string(),
