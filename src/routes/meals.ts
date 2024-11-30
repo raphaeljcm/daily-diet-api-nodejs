@@ -1,6 +1,8 @@
 import { FastifyInstance } from 'fastify';
 import { knex } from '@/knex';
 import { checkUserIdIdentity } from '@/middlewares/check-user-id-identity';
+import { randomUUID } from 'node:crypto';
+import { z } from 'zod';
 
 export async function mealsRoutes(app: FastifyInstance) {
   app.addHook('preHandler', async req => {
@@ -14,5 +16,38 @@ export async function mealsRoutes(app: FastifyInstance) {
       user_id: userId,
     });
     return reply.send({ meals });
+  });
+
+  app.post('/', async (req, reply) => {
+    const createMealSchema = z.object({
+      name: z.string(),
+      description: z.string().optional(),
+      mealTime: z.string(),
+      followedDiet: z.boolean(),
+    });
+
+    const { name, description, mealTime, followedDiet } =
+      createMealSchema.parse(req.body);
+
+    let userId = req.cookies.userId;
+
+    if (!userId) {
+      userId = randomUUID();
+      reply.cookie('userId', userId, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+      });
+    }
+
+    await knex('meals').insert({
+      id: randomUUID(),
+      name,
+      description,
+      meal_time: mealTime,
+      followed_diet: followedDiet,
+      user_id: userId,
+    });
+
+    return reply.status(201).send();
   });
 }
