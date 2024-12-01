@@ -8,4 +8,4 @@
 [x] Should be able to list all meals of a certain user  
 [x] Should be able to list a single meal of a certain user  
 [x] Should be able to list, edit, delete only allowed meals  
-[ ] Should be able to return user metrics  
+[x] Should be able to return user metrics  
