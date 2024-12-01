@@ -8,7 +8,7 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   await knex.schema.alterTable('meals', table => {
-    table.timestamp('created_at').defaultTo(knex.fn.now());
+    table.timestamp('created_at');
     table.timestamp('updated_at');
   });
 }
